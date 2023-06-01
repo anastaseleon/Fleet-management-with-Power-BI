@@ -40,7 +40,7 @@ i curently don<t have authorisation to share the raw data for the project  but i
 
 ```powerquery
 let
-    Source = Sql.Database("srvmsqltrsp1", "LogirackTransport", [Query="Select * from [LogirackTransport].[dbo].[Vw_Web_TrailersFrames]"]),
+    Source = Sql.Database("srvmsqltrsp1", "TMS", [Query="Select * from [TMS].[dbo].[Vw_Web_TrailersFrames]"]),
     #"Filtered Rows" = Table.SelectRows(Source, each ([IsTrailer] = 1) and ([DateLastUsed] <> null) and ([Rem_Actif] = 1) and ([AddressLastUsed] <> "Ongoing - 1015 GOLF LINKS RD, ANCASTER (ON)" and [AddressLastUsed] <> "Ongoing - 1070 REST ACRES RD, PARIS (ON)" and [AddressLastUsed] <> "Ongoing - 11250 Chemin de la Côte-de-Liesse, LACHINE (QC)" and [AddressLastUsed] <> "Ongoing - 11775 BRAMALEA RD, BRAMPTON (ON)" and [AddressLastUsed] <> "Ongoing - 1200 50e Avenue, LACHINE (QC)" and [AddressLastUsed] <> "Ongoing - 1200 BRANT ST UNIT A4, BURLINGTON (ON)" and [AddressLastUsed] <> "Ongoing - 145 CARRIER DRIVE, ETOBICOKE (ON)" and [AddressLastUsed] <> "Ongoing - 1735 KIPLING AVE, ETOBICOKE (ON)" and [AddressLastUsed] <> "Ongoing - 1800 46, LACHINE (QC)" and [AddressLastUsed] <> "Ongoing - 199 Summerlea Road, BRAMPTON (ON)" and [AddressLastUsed] <> "Ongoing - 200 Westcreek Blvd, BRAMPTON (ON)" and [AddressLastUsed] <> "Ongoing - 2054 Joyceville Rd, JOYCEVILLE (ON)" and [AddressLastUsed] <> "Ongoing - 206497 HWY 26, MEAFORD (ON)" and [AddressLastUsed] <> "Ongoing - 20775 RUE DAOUST, SAINTE ANNE DE BELLEVUE (QC)" and [AddressLastUsed] <> "Ongoing - 2190 BOUL DAGENAIS OUEST, LAVAL (QC)" and [AddressLastUsed] <> "Ongoing - 3200 Chemin de la baronne, VARENNES (QC)" and [AddressLastUsed] <> "Ongoing - 3353 BOUL DES SOURCES, DOLLARD DES ORMEAUX (QC)" and [AddressLastUsed] <> "Ongoing - 3465 WYECROFT RD, OAKVILLE (ON)" and [AddressLastUsed] <> "Ongoing - 3500 FAIRWAY 7275, LACHINE (QC)" and [AddressLastUsed] <> "Ongoing - 3500 RUE FAIRWAY, LACHINE (QC)" and [AddressLastUsed] <> "Ongoing - 3520 BOUL ST-JOSEPH EST, MONTREAL (QC)" and [AddressLastUsed] <> "Ongoing - 375 CHEMIN SAINT FRANCOIS OUEST, SAINT FRANCOIS DE MONTMAGNY (QC)" and [AddressLastUsed] <> "Ongoing - 381 BOUL DES LAURENTIDES, LAVAL (QC)" and [AddressLastUsed] <> "Ongoing - 4041 RUE WELLINGTON, VERDUN (QC)" and [AddressLastUsed] <> "Ongoing - 4145 Saint-Elzear Ouest, LAVAL (QC)" and [AddressLastUsed] <> "Ongoing - 5555 Royalmount, MONT ROYAL (QC)" and [AddressLastUsed] <> "Ongoing - 60 DRIVER RD, BRAMPTON (ON)" and [AddressLastUsed] <> "Ongoing - 666 WEST SAINT-MARTIN BOULEVARD, LAVAL (QC)" and [AddressLastUsed] <> "Ongoing - 700 AV BEAUMONT, MONTREAL (QC)" and [AddressLastUsed] <> "Ongoing - 7380 Bren Road, MISSISSAUGA (ON)" and [AddressLastUsed] <> "Ongoing - 9501 Highway 50, KLEINBURG (ON)")),
     #"Sorted Rows" = Table.Sort(#"Filtered Rows",{{"IdleTime", Order.Descending}}),
     #"Duplicated Column" = Table.DuplicateColumn(#"Sorted Rows", "Rem_Code", "Rem_Code - Copy"),
@@ -72,7 +72,7 @@ in
 **Trailer Issues**: This table, derived from an Excel sheet, is where coordinators compile issues about trailers. For example, it contains updates about when safety inspections are needed.
 ```powerquery
   let
-    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT SIMARD\Yard Audit.xlsm"), null, true),
+    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT \Yard Audit.xlsm"), null, true),
     issues_Table = Source{[Item="issues",Kind="Table"]}[Data],
     #"Changed Type" = Table.TransformColumnTypes(issues_Table,{{"DATE", type date}, {"Trailer", type text}, {"Status", type text}}),
     #"Changed Case" = Table.TransformColumns(#"Changed Type", {{"Trailer", Text.Upper, type text}}),
@@ -85,7 +85,7 @@ in
   
 **Dock Inventory**: This table contains information on when a trailer is unloaded, reloaded, and what type of loading it contains.
  ```powerquery let
-    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT SIMARD\Dock Inventory.xlsx"), null, true),
+    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT \Dock Inventory.xlsx"), null, true),
     doc_table = Source{[Item="2023 Freight on Dock",Kind="Sheet"]}[Data],
     #"Promoted Headers" = Table.PromoteHeaders(doc_table, [PromoteAllScalars=true]),
     #"Changed Type" = Table.TransformColumnTypes(#"Promoted Headers", {
@@ -119,7 +119,7 @@ in
 **Yard Inventory**: A yard inventory is performed every two days and is updated in this table using a Power app.
 ``` powerquery
   let
-    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT SIMARD\Documents\Yard check bck.xlsm"), null, true),
+    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT \Documents\Yard check bck.xlsm"), null, true),
     Yardchecks_Sheet = Source{[Item="Yardchecks",Kind="Sheet"]}[Data],
     #"Promoted Headers" = Table.PromoteHeaders(Yardchecks_Sheet, [PromoteAllScalars=true]),
   
@@ -134,7 +134,7 @@ in
 **Locations**: This table provides a list of locations where trailers can be, including client yards, our yard, and vendor yards.
 ``` powerquery
   let
-    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT SIMARD\Location.xlsx"), null, true),
+    Source = Excel.Workbook(File.Contents("C:\Users\didierl\OneDrive - L TRANSPORT \Location.xlsx"), null, true),
     Table1_Table = Source{[Item="Table1",Kind="Table"]}[Data],
     #"Changed Type" = Table.TransformColumnTypes(Table1_Table,{{"Company", type text}, {"Address", type text}, {"Approved drop location", type text}, {"Trailer Pool", Int64.Type}}),
     #"Removed Duplicates" = Table.Distinct(#"Changed Type", {"Company"}),
